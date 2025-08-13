@@ -59,13 +59,100 @@ jobs:
       - name: Determine build context
         id: context
         run: |
-          node .github/scripts/docker/docker-config.mjs \
-            --event "${{ github.event_name }}" \
-            --pr "${{ github.event.pull_request.number }}" \
-            --branch "${{ github.ref_name }}" \
-            --version "${{ inputs.n8n_version }}" \
-            --release-type "${{ inputs.release_type }}" \
-            --push-enabled "${{ inputs.push_enabled }}"
+          # Debug info
+          echo "Event: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Ref Name: ${{ github.ref_name }}"
+
+          # Check if called by another workflow (has n8n_version input)
+          if [[ -n "${{ inputs.n8n_version }}" ]]; then
+            # workflow_call - used for releases
+            {
+              echo "release_type=${{ inputs.release_type }}"
+              echo "n8n_version=${{ inputs.n8n_version }}"
+              echo "push_enabled=${{ inputs.push_enabled }}"
+            } >> "$GITHUB_OUTPUT"
+
+          elif [[ "${{ github.event_name }}" == "schedule" ]]; then
+            # Nightly builds
+            {
+              echo "release_type=nightly"
+              echo "n8n_version=snapshot"
+              echo "push_enabled=true"
+            } >> "$GITHUB_OUTPUT"
+
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            # Build branches for Nathan deploy
+            BRANCH_NAME="${{ github.ref_name }}"
+
+            # Fallback to parsing ref if ref_name is empty
+            if [[ -z "$BRANCH_NAME" ]] && [[ "${{ github.ref }}" =~ ^refs/heads/(.+)$ ]]; then
+              BRANCH_NAME="${BASH_REMATCH[1]}"
+            fi
+
+            # Sanitize branch name for Docker tag
+            SAFE_BRANCH_NAME=$(echo "$BRANCH_NAME" | tr '/' '-' | tr -cd '[:alnum:]-_')
+
+            if [[ -z "$SAFE_BRANCH_NAME" ]]; then
+              echo "Error: Could not determine valid branch name"
+              exit 1
+            fi
+
+            {
+              echo "release_type=branch"
+              echo "n8n_version=branch-${SAFE_BRANCH_NAME}"
+              echo "push_enabled=${{ inputs.push_enabled }}"
+            } >> "$GITHUB_OUTPUT"
+
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # Direct PR triggers for testing Dockerfile changes
+            {
+              echo "release_type=dev"
+              echo "n8n_version=pr-${{ github.event.pull_request.number }}"
+              echo "push_enabled=false"
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+          # Output summary for logs
+          echo "=== Build Context Summary ==="
+          echo "Release type: $(grep release_type "$GITHUB_OUTPUT" | cut -d= -f2)"
+          echo "N8N version: $(grep n8n_version "$GITHUB_OUTPUT" | cut -d= -f2)"
+          echo "Push enabled: $(grep push_enabled "$GITHUB_OUTPUT" | cut -d= -f2)"
+
+      - name: Determine build matrix
+        id: matrix
+        run: |
+          RELEASE_TYPE="${{ steps.context.outputs.release_type }}"
+
+          # Branch builds only need AMD64, everything else needs both platforms
+          if [[ "$RELEASE_TYPE" == "branch" ]]; then
+            MATRIX='{
+              "platform": ["amd64"],
+              "include": [{
+                "platform": "amd64",
+                "runner": "ubuntu-22.04",
+                "docker_platform": "linux/amd64"
+              }]
+            }'
+          else
+            # All other builds (stable, nightly, dev, PR) need both platforms
+            MATRIX='{
+              "platform": ["amd64", "arm64"],
+              "include": [{
+                "platform": "amd64",
+                "runner": "ubuntu-22.04",
+                "docker_platform": "linux/amd64"
+              }, {
+                "platform": "arm64",
+                "runner": "ubuntu-22.04-arm",
+                "docker_platform": "linux/arm64"
+              }]
+            }'
+          fi
+
+          # Output matrix as single line for GITHUB_OUTPUT
+          echo "matrix=$(echo "$MATRIX" | jq -c .)" >> "$GITHUB_OUTPUT"
+          echo "Build matrix: $(echo "$MATRIX" | jq .)"
 
   build-and-push-docker:
     name: Build App, then Build and Push Docker Image (${{ matrix.platform }})

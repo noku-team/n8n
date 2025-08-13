@@ -68,48 +68,34 @@
 	--color--orange-alpha-300: hsla(7, 100%, 68%, 0.35);
 	--color--orange-alpha-500: hsla(7, 100%, 68%, 0.5);
 
-	// Purple
-	--color--purple-50: hsl(247, 49%, 98%);
-	--color--purple-100: hsl(247, 49%, 95%);
-	--color--purple-200: hsl(247, 49%, 93%);
-	--color--purple-300: hsl(247, 49%, 83%);
-	--color--purple-400: hsl(247, 49%, 73%);
-	--color--purple-500: hsl(247, 49%, 63%);
-	--color--purple-600: hsl(247, 49%, 53%);
-	--color--purple-700: hsl(247, 49%, 43%);
-	--color--purple-800: hsl(247, 49%, 37%);
-	--color--purple-900: hsl(247, 49%, 30%);
-	--color--purple-950: hsl(247, 49%, 21%);
+	// Primary color
+	--color--primary--h: 238;
+	--color--primary--s: 84%;
+	--color--primary--l: 62%;
 
-	--color--purple-alpha-100: hsla(247, 49%, 53%, 0.1);
-	--color--purple-alpha-200: hsla(247, 49%, 53%, 0.25);
+	--color--primary--420: hsl(238, 84%, 52%);
+	--color--primary--320: hsl(238, 84%, 62%); // Base
+	--color--primary--220: hsl(238, 84%, 72%);
+	--color--primary--120: hsl(238, 84%, 82%);
+	--color--primary--070: hsl(238, 84%, 87%);
+	--color--primary--050: hsl(238, 84%, 89%);
+	--color--primary--030: hsl(238, 84%, 92%);
 
-	// Green
-	--color--green-50: hsl(144, 60%, 95%);
-	--color--green-100: hsl(145, 60%, 90%);
-	--color--green-200: hsl(145, 60%, 80%);
-	--color--green-300: hsl(146, 60%, 70%);
-	--color--green-400: hsl(147, 60%, 60%);
-	--color--green-500: hsl(147, 60%, 50%);
-	--color--green-600: hsl(147, 60%, 40%);
-	--color--green-700: hsl(147, 60%, 30%);
-	--color--green-800: hsl(148, 60%, 25%);
-	--color--green-900: hsl(148, 60%, 20%);
-	--color--green-950: hsl(151, 60%, 10%);
+	--color--primary--320--a-010: hsla(238, 84%, 62%, 0.1);
+	--color--primary--320--a-035: hsla(238, 84%, 62%, 0.35);
+	--color--primary--320--a-050: hsla(238, 84%, 62%, 0.5);
 
-	--color--green-alpha-100: hsl(147, 60%, 36%, 0.15);
-	--color--green-alpha-200: hsl(147, 60%, 36%, 0.25);
+	// Secondary color
+	--color--secondary--720: hsl(305, 84%, 28%);
+	--color--secondary--570: hsl(305, 84%, 33%);
+	--color--secondary--470: hsl(305, 84%, 38%); // Base
+	--color--secondary--370: hsl(305, 84%, 48%);
+	--color--secondary--270: hsl(305, 84%, 58%);
+	--color--secondary--170: hsl(305, 84%, 68%);
+	--color--secondary--070: hsl(305, 84%, 78%);
 
-	// Mint
-	--color--mint-100: hsl(147, 83%, 90%);
-	--color--mint-200: hsl(147, 83%, 80%);
-	--color--mint-300: hsl(147, 83%, 70%);
-	--color--mint-400: hsl(147, 83%, 60%);
-	--color--mint-500: hsl(147, 83%, 50%);
-	--color--mint-600: hsl(147, 83%, 44%);
-	--color--mint-700: hsl(147, 83%, 30%);
-	--color--mint-800: hsl(147, 83%, 20%);
-	--color--mint-900: hsl(147, 83%, 10%);
+	--color--secondary--470--a-010: hsla(305, 84%, 38%, 0.1);
+	--color--secondary--470--a-025: hsla(305, 84%, 38%, 0.25);
 
 	// Red
 	--color--red-50: hsl(356, 83%, 97%);
