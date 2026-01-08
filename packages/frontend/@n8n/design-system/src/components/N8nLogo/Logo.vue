@@ -1,5 +1,5 @@
 <script setup lang="ts">
-iimport { useFavicon } from '@vueuse/core';
+import { useFavicon } from '@vueuse/core';
 import { computed, onMounted, useCssModule, useTemplateRef } from 'vue';
 import LogoCollapsed from './logo-icon.svg';
 import LogoExpanded from './original-full.svg';
