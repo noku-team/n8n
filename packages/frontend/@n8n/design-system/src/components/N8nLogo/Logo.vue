@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { FrontendSettings } from '@n8n/api-types';
 import { useFavicon } from '@vueuse/core';
 import { computed, onMounted, useCssModule, useTemplateRef } from 'vue';
 import LogoCollapsed from './logo-icon.svg';
