@@ -1,40 +1,35 @@
 <script setup lang="ts">
-import type { FrontendSettings } from '@n8n/api-types';
 import { useFavicon } from '@vueuse/core';
 import { computed, onMounted, useCssModule, useTemplateRef } from 'vue';
-import LogoCollapsed from './logo-icon.svg';
-import LogoExpanded from './original-full.svg';
-//
+
+import LogoIcon from './logo-icon.svg';
+import LogoText from './logo-text.svg';
+
 const props = defineProps<
 	(
 		| {
-				location: 'authView';
+				size: 'large';
 		  }
 		| {
-				location: 'sidebar';
+				size: 'small';
 				collapsed: boolean;
 		  }
 	) & {
-		releaseChannel: FrontendSettings['releaseChannel'];
+		releaseChannel?: 'stable' | 'beta' | 'nightly' | 'dev' | 'rc';
 	}
 >();
 
-const { location, releaseChannel } = props;
+const { size, releaseChannel } = props;
 
-// const showLogoText = computed(() => {
-// 	if (location === 'authView') return true;
-// 	return !props.collapsed;
-// });
-
-const currentLogo = computed(() => {
-	if (location === 'authView') return LogoExpanded;
-	return 'collapsed' in props && props.collapsed ? LogoCollapsed : LogoExpanded;
+const showLogoText = computed(() => {
+	if (size === 'large') return true;
+	return !props.collapsed;
 });
 
 const $style = useCssModule();
 const containerClasses = computed(() => {
-	if (location === 'authView') {
-		return [$style.logoContainer, $style.authView];
+	if (size === 'large') {
+		return [$style.logoContainer, $style.large];
 	}
 	return [
 		$style.logoContainer,
@@ -45,7 +40,9 @@ const containerClasses = computed(() => {
 
 const svg = useTemplateRef<{ $el: Element }>('logo');
 onMounted(() => {
-	if (releaseChannel === 'stable' || !('createObjectURL' in URL)) return;
+	if (!releaseChannel || releaseChannel === 'stable' || !('createObjectURL' in URL)) {
+		return;
+	}
 
 	const logoEl = svg.value!.$el;
 
@@ -61,8 +58,8 @@ onMounted(() => {
 
 <template>
 	<div :class="containerClasses" data-test-id="n8n-logo">
-		<component :is="currentLogo" ref="logo" :class="$style.logo" />
-		<!-- <LogoText v-if="showLogoText" :class="$style.logoText" /> -->
+		<LogoIcon ref="logo" :class="$style.logo" />
+		<LogoText v-if="showLogoText" :class="$style.logoText" />
 		<slot />
 	</div>
 </template>
@@ -75,37 +72,34 @@ onMounted(() => {
 }
 
 .logoText {
-	margin-left: var(--spacing-5xs);
+	margin-left: var(--spacing--5xs);
 	path {
-		fill: var(--color-text-dark);
+		fill: var(--color--text--shade-1);
 	}
 }
 
-.authView {
+.large {
 	transform: scale(2);
-	margin-bottom: var(--spacing-xl);
+	margin-bottom: var(--spacing--xl);
 
 	.logo,
 	.logoText {
-		// transform: scale(0.4) translateY(-2px);
-		height: 40px;
-		width: auto;
+		transform: scale(1.3) translateY(-2px);
 	}
 
 	.logoText {
-		margin-left: var(--spacing-xs);
-		margin-right: var(--spacing-3xs);
+		margin-left: var(--spacing--xs);
+		margin-right: var(--spacing--3xs);
 	}
 }
 
 .sidebarExpanded .logo {
-	margin-left: var(--spacing-2xs);
-	width: 100px;
-	height: auto;
+	margin-left: var(--spacing--2xs);
 }
 
 .sidebarCollapsed .logo {
 	width: 40px;
-	height: 40px;
+	height: 30px;
+	padding: 0 var(--spacing--4xs);
 }
 </style>
